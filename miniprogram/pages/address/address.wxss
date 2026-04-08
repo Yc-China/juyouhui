@@ -1,0 +1,43 @@
+/* address.wxss */
+.container {
+  padding: 20rpx;
+}
+
+.form-card {
+  margin-top: 0;
+}
+
+.form-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.label {
+  width: 160rpx;
+  font-size: 30rpx;
+  color: #333;
+}
+
+.input {
+  flex: 1;
+  font-size: 30rpx;
+  color: #333;
+}
+
+.picker {
+  flex: 1;
+  font-size: 30rpx;
+  color: #333;
+  line-height: 1.6;
+}
+
+.submit-btn {
+  margin-top: 40rpx;
+  padding: 0 20rpx;
+}

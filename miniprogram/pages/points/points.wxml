@@ -1,0 +1,22 @@
+<!--points.wxml-->
+<view class="container">
+  <view wx:if="{{loading && list.length === 0}}" class="loading">加载中...</view>
+  <view wx:elif="{{list.length === 0}}" class="empty">
+    <text>暂无积分记录</text>
+  </view>
+  <view wx:else>
+    <view wx:for="{{list}}" wx:key="id" class="points-item card">
+      <view class="points-info">
+        <view class="points-desc">{{item.description}}</view>
+        <view class="points-date text-muted text-sm">{{item.createTime}}</view>
+      </view>
+      <view class="points-amount {{item.amount > 0 ? 'gain' : 'cost'}}">
+        {{item.amount > 0 ? '+' : ''}}{{item.amount}}
+      </view>
+    </view>
+    <view class="load-more" wx:if="{{hasMore}}">
+      <text wx:if="{{!loadingMore}}">加载更多</text>
+      <text wx:else>加载中...</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,27 @@
+<!--products.wxml-->
+<view class="container">
+  <view wx:if="{{loading && list.length === 0}}" class="loading">加载中...</view>
+  <view wx:elif="{{list.length === 0}}" class="empty">
+    <text>暂无礼品</text>
+  </view>
+  <view wx:else class="products-list">
+    <view wx:for="{{list}}" wx:key="id" class="product-item card">
+      <image class="product-image" src="{{item.cover}}" mode="aspectFill" />
+      <view class="product-info">
+        <view class="product-name">{{item.name}}</view>
+        <view class="product-desc text-muted text-sm">{{item.description}}</view>
+        <view class="product-footer">
+          <view class="product-points">
+            <text class="points-text">{{item.points}}</text>
+            <text class="points-unit">积分</text>
+          </view>
+          <button class="btn btn-primary btn-exchange" bindtap="exchangeProduct" data-id="{{item.id}}" data-points="{{item.points}}">立即兑换</button>
+        </view>
+      </view>
+    </view>
+    <view class="load-more" wx:if="{{hasMore}}">
+      <text wx:if="{{!loadingMore}}">加载更多</text>
+      <text wx:else>加载中...</text>
+    </view>
+  </view>
+</view>

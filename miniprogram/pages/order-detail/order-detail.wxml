@@ -1,0 +1,45 @@
+<!--order-detail.wxml-->
+<view wx:if="{{order}}" class="container">
+  <view class="status-card card">
+    <view class="status-text {{getStatusClass(order.status)}}">
+      {{getStatusText(order.status)}}
+    </view>
+  </view>
+
+  <view class="product-card card">
+    <image class="product-image" src="{{order.productCover}}" mode="aspectFill" />
+    <view class="product-info">
+      <view class="product-name">{{order.productName}}</view>
+      <view class="product-points text-primary">{{order.points}} 积分</view>
+    </view>
+  </view>
+
+  <view class="address-card card">
+    <view class="card-title">收货信息</view>
+    <view class="receiver-info">
+      <text class="receiver-name">{{order.receiverName}}</text>
+      <text class="receiver-phone">{{order.receiverPhone}}</text>
+    </view>
+    <view class="receiver-address">
+      {{order.province}}{{order.city}}{{order.district}} {{order.detail}}
+    </view>
+  </view>
+
+  <view class="order-info-card card">
+    <view class="info-item">
+      <text class="label">订单编号</text>
+      <text class="value">{{order.orderNo}}</text>
+    </view>
+    <view class="info-item">
+      <text class="label">兑换时间</text>
+      <text class="value">{{order.createTime}}</text>
+    </view>
+    <view class="info-item" wx:if="{{order.expressCompany && order.expressNo}}">
+      <text class="label">物流信息</text>
+      <text class="value">{{order.expressCompany}} {{order.expressNo}}</text>
+    </view>
+  </view>
+</view>
+
+<view wx:elif="{{loading}}" class="loading">加载中...</view>
+<view wx:else class="empty">订单不存在</view>

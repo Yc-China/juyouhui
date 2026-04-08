@@ -1,0 +1,131 @@
+/* order-detail.wxss */
+.container {
+  min-height: 100vh;
+  padding: 20rpx 0;
+}
+
+.status-card {
+  text-align: center;
+  margin-top: 20rpx;
+}
+
+.status-text {
+  display: inline-block;
+  padding: 16rpx 48rpx;
+  border-radius: 40rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+}
+
+.status-wait {
+  background-color: #FFF7E6;
+  color: #FA8C16;
+}
+
+.status-send {
+  background-color: #E6F7FF;
+  color: #1890FF;
+}
+
+.status-done {
+  background-color: #F6FFED;
+  color: #52C41A;
+}
+
+.status-cancel {
+  background-color: #F5F5F5;
+  color: #999;
+}
+
+.product-card {
+  display: flex;
+  align-items: center;
+  margin-top: 20rpx;
+}
+
+.product-image {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 8rpx;
+  background-color: #f5f5f5;
+}
+
+.product-info {
+  margin-left: 24rpx;
+}
+
+.product-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+
+.product-points {
+  font-size: 28rpx;
+}
+
+.address-card {
+  margin-top: 20rpx;
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.receiver-info {
+  margin-bottom: 12rpx;
+}
+
+.receiver-name {
+  font-size: 30rpx;
+  color: #333;
+}
+
+.receiver-phone {
+  font-size: 28rpx;
+  color: #666;
+  margin-left: 20rpx;
+}
+
+.receiver-address {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+.order-info-card {
+  margin-top: 20rpx;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 16rpx 0;
+}
+
+.info-item:first-child {
+  padding-top: 0;
+}
+
+.label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.value {
+  font-size: 28rpx;
+  color: #333;
+  max-width: 70%;
+  text-align: right;
+}
+
+.loading, .empty {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999;
+  font-size: 28rpx;
+}

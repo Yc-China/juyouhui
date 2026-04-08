@@ -1,0 +1,79 @@
+<!--exchange.wxml 同时处理创建订单和订单列表-->
+<view wx:if="{{productId}}" class="create-container">
+  <!-- 创建兑换订单 -->
+  <view wx:if="{{product}}" class="product-info card">
+    <image class="product-image" src="{{product.cover}}" mode="aspectFill" />
+    <view class="product-detail">
+      <view class="product-name">{{product.name}}</view>
+      <view class="product-points">
+        <text class="text-primary">{{product.points}}</text> 积分
+      </view>
+      <view class="product-desc text-muted text-sm">{{product.description}}</view>
+    </view>
+  </view>
+
+  <view class="address-card card" bindtap="selectAddress">
+    <view wx:if="{{!address}}" class="empty-address">
+      <text>请填写收货地址</text>
+      <text class="arrow">></text>
+    </view>
+    <view wx:else class="selected-address">
+      <view class="address-info">
+        <view class="receiver">
+          <text>{{address.receiverName}}</text>
+          <text class="phone">{{address.receiverPhone}}</text>
+        </view>
+        <view class="address-detail">{{address.province}}{{address.city}}{{address.district}} {{address.detail}}</view>
+      </view>
+      <text class="arrow">></text>
+    </view>
+  </view>
+
+  <view class="points-summary card">
+    <view class="summary-item">
+      <text>兑换积分</text>
+      <text class="text-primary">-{{requiredPoints}}</text>
+    </view>
+    <view class="summary-item">
+      <text>当前可用积分</text>
+      <text>{{availablePoints}}</text>
+    </view>
+    <view class="summary-item total">
+      <text>兑换后剩余积分</text>
+      <text>{{availablePoints - requiredPoints}}</text>
+    </view>
+  </view>
+
+  <view class="submit-btn">
+    <button class="btn btn-primary {{canExchange ? '' : 'btn-disabled'}}" bindtap="submitExchange" disabled="{{!canExchange}}">
+      确认兑换
+    </button>
+    <view wx:if="{{!enoughPoints}}" class="error-tip text-sm">积分不足，无法兑换</view>
+  </view>
+</view>
+
+<view wx:else class="list-container">
+  <!-- 兑换订单列表 -->
+  <view wx:if="{{loading && list.length === 0}}" class="loading">加载中...</view>
+  <view wx:elif="{{list.length === 0}}" class="empty">暂无兑换订单</view>
+  <view wx:else>
+    <view wx:for="{{list}}" wx:key="id" class="order-item card" bindtap="goToDetail" data-id="{{item.id}}">
+      <view class="order-header">
+        <text class="order-number">订单号：{{item.orderNo}}</text>
+        <text class="order-status {{item.status === 0 ? 'status-wait' : item.status === 1 ? 'status-send' : 'status-done'}}">{{statusText[item.status]}}</text>
+      </view>
+      <view class="order-body">
+        <image class="order-image" src="{{item.productCover}}" mode="aspectFill" />
+        <view class="order-info">
+          <view class="product-name">{{item.productName}}</view>
+          <view class="order-points text-primary">{{item.points}} 积分</view>
+          <view class="order-time text-muted text-sm">{{item.createTime}}</view>
+        </view>
+      </view>
+    </view>
+    <view class="load-more" wx:if="{{hasMore}}">
+      <text wx:if="{{!loadingMore}}">加载更多</text>
+      <text wx:else>加载中...</text>
+    </view>
+  </view>
+</view>

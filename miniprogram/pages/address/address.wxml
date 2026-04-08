@@ -1,0 +1,29 @@
+<!--address.wxml-->
+<view class="container">
+  <view class="form-card card">
+    <view class="form-item">
+      <text class="label">收货人</text>
+      <input class="input" placeholder="请输入收货人姓名" value="{{address.receiverName}}" bindinput="onNameInput" />
+    </view>
+    <view class="form-item">
+      <text class="label">手机号码</text>
+      <input class="input" placeholder="请输入手机号码" type="number" value="{{address.receiverPhone}}" bindinput="onPhoneInput" />
+    </view>
+    <view class="form-item">
+      <text class="label">所在地区</text>
+      <picker mode="region" bindchange="onRegionChange" value="{{region}}">
+        <view class="picker">
+          {{address.province}}{{address.city}}{{address.district}}
+        </view>
+      </picker>
+    </view>
+    <view class="form-item">
+      <text class="label">详细地址</text>
+      <input class="input" placeholder="请输入街道、门牌号" value="{{address.detail}}" bindinput="onDetailInput" />
+    </view>
+  </view>
+
+  <view class="submit-btn">
+    <button class="btn btn-primary" bindtap="saveAddress">保存地址</button>
+  </view>
+</view>

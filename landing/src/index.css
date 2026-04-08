@@ -1,0 +1,32 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans text-gray-800 bg-white;
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-secondary border border-secondary px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors;
+  }
+
+  .section {
+    @apply py-16 md:py-24;
+  }
+}

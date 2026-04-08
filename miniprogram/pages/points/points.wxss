@@ -1,0 +1,54 @@
+/* points.wxss */
+.container {
+  min-height: 100vh;
+  padding: 20rpx 0;
+}
+
+.points-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 20rpx 20rpx;
+}
+
+.points-info {
+  flex: 1;
+}
+
+.points-desc {
+  font-size: 30rpx;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.points-date {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.points-amount {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.points-amount.gain {
+  color: #07C160;
+}
+
+.points-amount.cost {
+  color: #FF6B35;
+}
+
+.loading, .empty {
+  text-align: center;
+  padding: 100rpx 0;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.load-more {
+  text-align: center;
+  padding: 30rpx 0;
+  color: #999;
+  font-size: 26rpx;
+}

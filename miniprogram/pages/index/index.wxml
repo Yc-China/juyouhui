@@ -1,0 +1,51 @@
+<!--index.wxml-->
+<view wx:if="{{!isLogin}}" class="login-container">
+  <view class="login-logo">
+    <text class="logo-text">聚优惠</text>
+    <text class="logo-desc">积分兑换好礼</text>
+  </view>
+  <view class="login-tip">授权手机号即可登录，查看积分兑换礼品</view>
+  <button class="btn btn-primary mt-30" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">微信授权登录</button>
+</view>
+
+<view wx:else class="container">
+  <!-- 积分卡片 -->
+  <view class="points-card">
+    <view class="points-info">
+      <view class="available-points">
+        <text class="points-label">当前可用积分</text>
+        <text class="points-value text-primary">{{userInfo.availablePoints}}</text>
+      </view>
+      <view class="total-points">
+        <text class="total-label">累计获得积分</text>
+        <text class="total-value">{{userInfo.totalPoints}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能入口 -->
+  <view class="grid-menu">
+    <view class="menu-item" bindtap="goToProducts">
+      <view class="menu-icon gift-icon"></view>
+      <text>兑换礼品</text>
+    </view>
+    <view class="menu-item" bindtap="goToPoints">
+      <view class="menu-icon points-icon"></view>
+      <text>积分流水</text>
+    </view>
+    <view class="menu-item" bindtap="goToExchange">
+      <view class="menu-icon order-icon"></view>
+      <text>兑换记录</text>
+    </view>
+    <view class="menu-item" bindtap="goToMe">
+      <view class="menu-icon me-icon"></view>
+      <text>个人中心</text>
+    </view>
+  </view>
+
+  <!-- 提示 -->
+  <view class="notice-card">
+    <view class="notice-title">📢 积分说明</view>
+    <view class="notice-content">积分有效期为一年，从获得之日开始计算，请及时兑换哟~</view>
+  </view>
+</view>
