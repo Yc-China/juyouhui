@@ -1,0 +1,71 @@
+<script setup lang="uts">
+	// #ifdef APP-ANDROID || APP-HARMONY
+	let firstBackTime = 0
+	// #endif
+
+	import { TOKEN_KEY } from '@/api/config'
+
+	onLaunch(() => {
+		console.log('App Launch')
+
+		// 检查是否已有登录 token
+		const token = uni.getStorageSync(TOKEN_KEY)
+		if (token) {
+			// 已登录，跳转到首页
+			setTimeout(() => {
+				uni.switchTab({
+					url: '/pages/index/index'
+				})
+			}, 500)
+		} else {
+			// 未登录，跳转到登录页
+			setTimeout(() => {
+				uni.navigateTo({
+					url: '/pages/login/login'
+				})
+			}, 500)
+		}
+	})
+
+	onAppShow(() => {
+		console.log('App Show')
+	})
+
+	onAppHide(() => {
+		console.log('App Hide')
+	})
+
+	// #ifdef APP-ANDROID || APP-HARMONY
+	onLastPageBackPress(() => {
+		console.log('App LastPageBackPress')
+		if (firstBackTime == 0) {
+			uni.showToast({
+				title: '再按一次退出应用',
+				position: 'bottom',
+			})
+			firstBackTime = Date.now()
+			setTimeout(() => {
+				firstBackTime = 0
+			}, 2000)
+		} else if (Date.now() - firstBackTime < 2000) {
+			firstBackTime = Date.now()
+			uni.exit()
+		}
+	})
+
+	onExit(() => {
+		console.log('App Exit')
+	})
+	// #endif
+</script>
+
+<style>
+	/*每个页面公共css */
+	.uni-row {
+		flex-direction: row;
+	}
+
+	.uni-column {
+		flex-direction: column;
+	}
+</style>

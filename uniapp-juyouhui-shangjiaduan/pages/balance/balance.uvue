@@ -1,0 +1,308 @@
+<template>
+	<view class="container">
+		<!-- 余额卡片 -->
+		<view class="balance-card">
+			<text class="balance-label">当前可用余额（元）</text>
+			<text class="balance-value">¥{{ balance }}</text>
+			<button class="btn-recharge" @click="showRechargeModal">立即充值</button>
+		</view>
+
+		<!-- 余额明细 -->
+		<view class="section">
+			<text class="section-title">余额明细</text>
+			<view v-if="recordList.length > 0" class="list">
+				<view v-for="item in recordList" :key="item.id" class="record-item">
+					<view class="record-info">
+						<text class="record-type">{{ item.status === 'PENDING' ? '待支付' : '充值成功' }}</text>
+						<text class="record-time">{{ item.createdAt }}</text>
+					</view>
+					<view class="record-amount positive">
+						+{{ item.amount.toFixed(2) }}
+					</view>
+				</view>
+			</view>
+			<view v-else class="empty">暂无明细</view>
+		</view>
+
+		<!-- 充值弹窗 -->
+		<view v-if="showModal" class="modal-overlay" @click="closeRechargeModal">
+			<view class="modal-content" @click.stop>
+				<text class="modal-title">充值金额</text>
+
+				<view class="quick-options">
+					<view v-for="opt in quickOptions" :key="opt" :class="['quick-option', rechargeAmount == opt ? 'active' : '']" @click="selectQuick(opt)">
+						{{ opt }}
+					</view>
+				</view>
+
+				<view class="input-wrapper">
+					<text class="prefix">¥</text>
+					<input class="input" v-model.number="rechargeAmount" type="number" placeholder="自定义金额" />
+				</view>
+
+				<button class="btn-confirm" @click="confirmRecharge">确认充值</button>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script lang="uts" setup>
+	import { ref } from 'vue'
+	import { getMerchantProfileApi } from '@/api/home'
+	import { getBalanceInfoApi, createRechargeApi, type RechargeRecord } from '@/api/balance'
+
+	const balance = ref(0.00) // 余额单位：元
+	const showModal = ref(false)
+	const rechargeAmount = ref(100)
+	const quickOptions = [50, 100, 200, 500]
+	const recordList = ref<RechargeRecord[]>([])
+
+	async function loadData() {
+		try {
+			// 从 profile 获取最新余额
+			const profileRes = await getMerchantProfileApi()
+			balance.value = profileRes.balancePoints / 100
+
+			// 获取充值记录
+			const recordsRes = await getBalanceInfoApi()
+			recordList.value = recordsRes.records
+		} catch (e) {
+			console.error('加载余额信息失败', e)
+		}
+	}
+
+	function showRechargeModal() {
+		showModal.value = true
+	}
+
+	function closeRechargeModal() {
+		showModal.value = false
+	}
+
+	function selectQuick(amount: number) {
+		rechargeAmount.value = amount
+	}
+
+	async function confirmRecharge() {
+		if (!rechargeAmount.value || rechargeAmount.value <= 0) {
+			uni.showToast({
+				title: '请输入正确的充值金额',
+				icon: 'none'
+			})
+			return
+		}
+
+		try {
+			const res = await createRechargeApi({
+				amount: rechargeAmount.value
+			})
+
+			// 创建订单成功，在小程序环境这里需要拉起微信支付
+			// 当前是开发环境，直接提示成功
+			uni.showToast({
+				title: '充值订单创建成功',
+				icon: 'success'
+			})
+
+			closeRechargeModal()
+			// 刷新数据
+			loadData()
+		} catch (e) {
+			console.error('充值失败', e)
+		}
+	}
+
+	onShow(function () {
+		loadData()
+	})
+</script>
+
+<style lang="scss">
+	.container {
+		min-height: 100vh;
+		background-color: #f7f7f7;
+	}
+
+	.balance-card {
+		background: linear-gradient(135deg, #3cc51f, #5cd942);
+		padding: 60rpx 30rpx;
+		text-align: center;
+		color: #fff;
+		box-shadow: 0 4rpx 12rpx rgba(60, 197, 31, 0.3);
+	}
+
+	.balance-label {
+		display: block;
+		font-size: 28rpx;
+		opacity: 0.9;
+		margin-bottom: 20rpx;
+	}
+
+	.balance-value {
+		display: block;
+		font-size: 72rpx;
+		font-weight: bold;
+		margin-bottom: 30rpx;
+	}
+
+	.btn-recharge {
+		background-color: #fff;
+		color: #3cc51f;
+		font-size: 28rpx;
+		border-radius: 50rpx;
+		padding: 15rpx 50rpx;
+		line-height: 1;
+		border: none;
+		display: inline-block;
+		width: auto;
+	}
+
+	.section {
+		margin-top: 24rpx;
+		background-color: #fff;
+		border-radius: 16rpx;
+		padding: 30rpx;
+		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
+	}
+
+	.section-title {
+		display: block;
+		font-size: 32rpx;
+		font-weight: bold;
+		color: #333;
+		margin-bottom: 20rpx;
+	}
+
+	.record-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 25rpx 0;
+		border-bottom: 1px solid #f5f5f5;
+
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+
+	.record-info {
+		flex: 1;
+	}
+
+	.record-type {
+		display: block;
+		font-size: 30rpx;
+		color: #333;
+		margin-bottom: 8rpx;
+	}
+
+	.record-time {
+		display: block;
+		font-size: 24rpx;
+		color: #999;
+	}
+
+	.record-amount {
+		font-size: 32rpx;
+		font-weight: bold;
+
+		&.positive {
+			color: #3cc51f;
+		}
+
+		&.negative {
+			color: #999;
+		}
+	}
+
+	.empty {
+		text-align: center;
+		padding: 60rpx 0;
+		color: #999;
+		font-size: 26rpx;
+	}
+
+	/* 弹窗样式 */
+	.modal-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0, 0, 0, 0.5);
+		display: flex;
+		align-items: flex-end;
+		z-index: 999;
+	}
+
+	.modal-content {
+		width: 100%;
+		background-color: #fff;
+		border-radius: 20rpx 20rpx 0 0;
+		padding: 40rpx 30rpx 30rpx;
+	}
+
+	.modal-title {
+		display: block;
+		font-size: 34rpx;
+		font-weight: bold;
+		color: #333;
+		text-align: center;
+		margin-bottom: 30rpx;
+	}
+
+	.quick-options {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		margin-bottom: 30rpx;
+	}
+
+	.quick-option {
+		width: 22%;
+		text-align: center;
+		padding: 20rpx 0;
+		border: 1px solid #eee;
+		border-radius: 8rpx;
+		font-size: 28rpx;
+		color: #333;
+		box-sizing: border-box;
+
+		&.active {
+			background-color: #3cc51f;
+			color: #fff;
+			border-color: #3cc51f;
+		}
+	}
+
+	.input-wrapper {
+		display: flex;
+		align-items: center;
+		border: 1px solid #eee;
+		border-radius: 8rpx;
+		padding: 20rpx;
+		margin-bottom: 40rpx;
+
+		.prefix {
+			font-size: 32rpx;
+			color: #333;
+			margin-right: 10rpx;
+		}
+
+		.input {
+			flex: 1;
+			font-size: 32rpx;
+		}
+	}
+
+	.btn-confirm {
+		width: 100%;
+		height: 90rpx;
+		background-color: #3cc51f;
+		color: #fff;
+		font-size: 34rpx;
+		border-radius: 45rpx;
+		line-height: 90rpx;
+		padding: 0;
+	}
+</style>

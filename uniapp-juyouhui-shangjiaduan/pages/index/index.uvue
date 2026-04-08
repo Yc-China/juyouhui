@@ -1,0 +1,237 @@
+<template>
+	<view class="container">
+		<!-- 账户信息卡片 -->
+		<view class="card balance-card">
+			<view class="balance-info">
+				<text class="balance-label">账户余额</text>
+				<text class="balance-value">¥{{ balance }}</text>
+			</view>
+			<view class="balance-actions">
+				<button class="btn-recharge" @click="goToRecharge">去充值</button>
+			</view>
+		</view>
+
+		<!-- 数据概览 -->
+		<view class="card stats-card">
+			<view class="stats-item">
+				<text class="stats-value">{{ todayPoints }}</text>
+				<text class="stats-label">今日发放积分</text>
+			</view>
+			<view class="stats-divider"></view>
+			<view class="stats-item">
+				<text class="stats-value">{{ totalPoints }}</text>
+				<text class="stats-label">累计发放积分</text>
+			</view>
+		</view>
+
+		<!-- 功能菜单 -->
+		<view class="grid-menu">
+			<view class="menu-item" @click="goToScan">
+				<view class="menu-icon scan-icon">
+					<text class="icon">🔍</text>
+				</view>
+				<text class="menu-text">扫码发积分</text>
+			</view>
+			<view class="menu-item" @click="goToRecord">
+				<view class="menu-icon record-icon">
+					<text class="icon">📋</text>
+				</view>
+				<text class="menu-text">积分记录</text>
+			</view>
+			<view class="menu-item" @click="goToStore">
+				<view class="menu-icon store-icon">
+					<text class="icon">🏪</text>
+				</view>
+				<text class="menu-text">门店管理</text>
+			</view>
+			<view class="menu-item" @click="goToBalance">
+				<view class="menu-icon balance-icon">
+					<text class="icon">💰</text>
+				</view>
+				<text class="menu-text">余额明细</text>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script lang="uts" setup>
+	import { ref } from 'vue'
+	import { getHomeStatsApi } from '@/api/home'
+
+	const balance = ref(0.00) // 账户余额（元）
+	const todayPoints = ref(0) // 今日发放积分
+	const totalPoints = ref(0) // 累计发放积分
+
+	async function loadData() {
+		try {
+			const res = await getHomeStatsApi()
+			balance.value = res.balance
+			todayPoints.value = res.todayPoints
+			totalPoints.value = res.totalPoints
+		} catch (e) {
+			console.error('加载首页数据失败', e)
+		}
+	}
+
+	function goToRecharge() {
+		uni.navigateTo({
+			url: '/pages/balance/balance'
+		})
+	}
+
+	function goToScan() {
+		uni.switchTab({
+			url: '/pages/scan/scan'
+		})
+	}
+
+	function goToRecord() {
+		uni.navigateTo({
+			url: '/pages/point-record/point-record'
+		})
+	}
+
+	function goToStore() {
+		uni.navigateTo({
+			url: '/pages/store/store'
+		})
+	}
+
+	function goToBalance() {
+		uni.navigateTo({
+			url: '/pages/balance/balance'
+		})
+	}
+
+	// uni-app x 生命周期挂载方式
+	onShow(function () {
+		loadData()
+	})
+</script>
+
+<style lang="scss">
+	.container {
+		min-height: 100vh;
+		padding: 20rpx;
+		background-color: #f7f7f7;
+	}
+
+	.card {
+		background-color: #fff;
+		border-radius: 16rpx;
+		padding: 30rpx;
+		margin-bottom: 24rpx;
+		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
+	}
+
+	.balance-card {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		background: linear-gradient(135deg, #3cc51f, #5cd942);
+	}
+
+	.balance-info {
+		color: #fff;
+	}
+
+	.balance-label {
+		display: block;
+		font-size: 28rpx;
+		opacity: 0.9;
+		margin-bottom: 10rpx;
+	}
+
+	.balance-value {
+		display: block;
+		font-size: 48rpx;
+		font-weight: bold;
+	}
+
+	.btn-recharge {
+		background-color: #fff;
+		color: #3cc51f;
+		font-size: 28rpx;
+		border-radius: 50rpx;
+		padding: 10rpx 30rpx;
+		line-height: 1;
+		border: none;
+	}
+
+	.stats-card {
+		display: flex;
+	}
+
+	.stats-item {
+		flex: 1;
+		text-align: center;
+	}
+
+	.stats-value {
+		display: block;
+		font-size: 40rpx;
+		font-weight: bold;
+		color: #333;
+		margin-bottom: 10rpx;
+	}
+
+	.stats-label {
+		display: block;
+		font-size: 26rpx;
+		color: #999;
+	}
+
+	.stats-divider {
+		width: 1px;
+		background-color: #eee;
+	}
+
+	.grid-menu {
+		display: flex;
+		flex-wrap: wrap;
+		background-color: #fff;
+		border-radius: 16rpx;
+		padding: 20rpx 0;
+	}
+
+	.menu-item {
+		width: 25%;
+		text-align: center;
+		padding: 20rpx 0;
+	}
+
+	.menu-icon {
+		width: 80rpx;
+		height: 80rpx;
+		border-radius: 16rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: 0 auto 10rpx;
+	}
+
+	.menu-icon .icon {
+		font-size: 40rpx;
+	}
+
+	.scan-icon {
+		background-color: #e8f5e9;
+	}
+
+	.record-icon {
+		background-color: #e3f2fd;
+	}
+
+	.store-icon {
+		background-color: #fff3e0;
+	}
+
+	.balance-icon {
+		background-color: #fce4ec;
+	}
+
+	.menu-text {
+		font-size: 26rpx;
+		color: #333;
+	}
+</style>

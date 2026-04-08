@@ -1,0 +1,274 @@
+<template>
+	<view class="container">
+		<view class="input-section">
+			<view class="input-item">
+				<text class="label">用户ID/手机号</text>
+				<input class="input" v-model="userId" placeholder="请输入用户ID或手机号" placeholder-class="placeholder" />
+			</view>
+			<view class="input-item">
+				<text class="label">消费金额</text>
+				<input class="input" v-model.number="amount" type="number" placeholder="请输入消费金额" placeholder-class="placeholder" />
+			</view>
+			<view class="rule-hint">
+				消费 {{ rule }}元 = 赠送 1 积分，预计赠送积分：{{ estimatedPoints }}
+			</view>
+		</view>
+
+		<view class="scan-section">
+			<button class="btn-scan" @click="handleScan">
+				<text class="scan-icon">📷</text> 扫码用户二维码
+			</button>
+		</view>
+
+		<view v-if="userInfo" class="user-card">
+			<view class="user-info">
+				<text class="user-label">用户信息</text>
+				<view class="user-row">
+					<text class="user-key">用户ID：</text>
+					<text class="user-value">{{ userInfo.id }}</text>
+				</view>
+				<view class="user-row">
+					<text class="user-key">昵称：</text>
+					<text class="user-value">{{ userInfo.nickname }}</text>
+				</view>
+				<view class="user-row">
+					<text class="user-key">当前积分：</text>
+					<text class="user-value">{{ userInfo.points }}</text>
+				</view>
+			</view>
+		</view>
+
+		<button v-if="userInfo" class="btn-submit" @click="handleSubmit" :loading="loading">{{ loading ? '发放中...' : `确认发放 ${estimatedPoints} 积分` }}</button>
+	</view>
+</template>
+
+<script lang="uts" setup>
+	import { ref, computed, watch } from 'vue'
+	import { getUserInfoApi, grantPointsApi, type UserInfo } from '@/api/point'
+
+	const userId = ref('')
+	const amount = ref('')
+	const userInfo = ref<null | UserInfo>(null)
+	const loading = ref(false)
+
+	// 积分规则：1元 = 1分（后端会重新计算）
+	const estimatedPoints = computed(() => {
+		if (!amount.value) return 0
+		return Math.floor(Number(amount.value))
+	})
+
+	function handleScan() {
+		// 调用微信扫码
+		uni.scanCode({
+			success: (res) => {
+				console.log('扫码结果', res.result)
+				userId.value = res.result
+				fetchUserInfo()
+			},
+			fail: () => {
+				uni.showToast({
+					title: '扫码取消',
+					icon: 'none'
+				})
+			}
+		})
+	}
+
+	async function fetchUserInfo() {
+		if (!userId.value) {
+			uni.showToast({
+				title: '请输入用户ID',
+				icon: 'none'
+			})
+			return
+		}
+
+		try {
+			const res = await getUserInfoApi(Number(userId.value))
+			userInfo.value = res
+			uni.showToast({
+				title: '查询成功',
+				icon: 'success'
+			})
+		} catch (e) {
+			userInfo.value = null
+			console.error(e)
+		}
+	}
+
+	async function handleSubmit() {
+		if (!userInfo.value) {
+			uni.showToast({
+				title: '请先查询用户信息',
+				icon: 'none'
+			})
+			return
+		}
+
+		if (!amount.value || Number(amount.value) <= 0) {
+			uni.showToast({
+				title: '请输入正确的消费金额',
+				icon: 'none'
+			})
+			return
+		}
+
+		loading.value = true
+
+		try {
+			await grantPointsApi({
+				userId: Number(userId.value),
+				consumptionAmount: Number(amount.value)
+			})
+
+			uni.showToast({
+				title: '发放成功',
+				icon: 'success'
+			})
+
+			// 清空表单
+			userId.value = ''
+			amount.value = ''
+			userInfo.value = null
+		} catch (e) {
+			console.error(e)
+		} finally {
+			loading.value = false
+		}
+	}
+
+	// 输入框失去焦点时自动查询用户
+	watch(userId, (newVal) => {
+		if (newVal && newVal.length >= 1) {
+			fetchUserInfo()
+		}
+	})
+</script>
+
+<style lang="scss">
+	.container {
+		min-height: 100vh;
+		padding: 20rpx;
+		background-color: #f7f7f7;
+	}
+
+	.input-section {
+		background-color: #fff;
+		border-radius: 16rpx;
+		padding: 30rpx;
+		margin-bottom: 24rpx;
+		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
+	}
+
+	.input-item {
+		margin-bottom: 30rpx;
+	}
+
+	.input-item:last-child {
+		margin-bottom: 20rpx;
+	}
+
+	.label {
+		display: block;
+		font-size: 28rpx;
+		color: #333;
+		margin-bottom: 10rpx;
+	}
+
+	.input {
+		width: 100%;
+		height: 80rpx;
+		padding: 0 20rpx;
+		border: 1px solid #eee;
+		border-radius: 8rpx;
+		font-size: 30rpx;
+		box-sizing: border-box;
+		background-color: #fafafa;
+	}
+
+	.placeholder {
+		color: #ccc;
+	}
+
+	.rule-hint {
+		font-size: 26rpx;
+		color: #666;
+		padding-top: 10rpx;
+	}
+
+	.scan-section {
+		text-align: center;
+		margin-bottom: 24rpx;
+	}
+
+	.user-card {
+		background-color: #fff;
+		border-radius: 16rpx;
+		padding: 30rpx;
+		margin-bottom: 24rpx;
+		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.06);
+	}
+
+	.btn-scan {
+		background-color: #fff;
+		color: #3cc51f;
+		border: 2rpx dashed #3cc51f;
+		border-radius: 16rpx;
+		padding: 40rpx;
+		font-size: 32rpx;
+		width: 100%;
+		line-height: 1;
+
+		.scan-icon {
+			font-size: 36rpx;
+			margin-right: 10rpx;
+		}
+	}
+
+	.user-card {
+		background-color: #fff;
+		border-radius: 16rpx;
+		padding: 30rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.user-label {
+		display: block;
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #333;
+		margin-bottom: 20rpx;
+	}
+
+	.user-row {
+		display: flex;
+		margin-bottom: 15rpx;
+	}
+
+	.user-row:last-child {
+		margin-bottom: 0;
+	}
+
+	.user-key {
+		font-size: 28rpx;
+		color: #666;
+		width: 80rpx;
+	}
+
+	.user-value {
+		font-size: 28rpx;
+		color: #333;
+		flex: 1;
+	}
+
+	.btn-submit {
+		width: 100%;
+		height: 90rpx;
+		background-color: #3cc51f;
+		color: #fff;
+		font-size: 34rpx;
+		border-radius: 16rpx;
+		line-height: 90rpx;
+		padding: 0;
+	}
+</style>
