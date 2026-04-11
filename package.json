@@ -1,0 +1,18 @@
+{
+  "name": "juyouhui",
+  "version": "1.0.0",
+  "description": "聚优惠 - 餐饮积分联盟平台",
+  "private": true,
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "start:server": "cd server && bash start.sh",
+    "build": "pnpm -r build"
+  },
+  "keywords": [
+    "juyouhui",
+    "积分联盟",
+    "餐饮"
+  ],
+  "author": "Yc-China",
+  "license": "MIT"
+}

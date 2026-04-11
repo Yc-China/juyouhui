@@ -1,9 +1,7 @@
 # Dependencies
 node_modules/
-# 保留 lock 文件，保证依赖版本一致
-# package-lock.json
-# yarn.lock
-pnpm-lock.yaml
+package-lock.json
+yarn.lock
 
 # Environment variables
 .env

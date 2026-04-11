@@ -1,0 +1,193 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户（小程序端）
+model User {
+  id          Int       @id @default(autoincrement())
+  phone       String    @unique // 手机号
+  nickname    String?   // 昵称
+  avatar      String?   // 头像
+  openid      String?   // 微信 openid
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userPoints  UserPoint[]
+  pointRecords PointRecord[]
+  exchangeOrders ExchangeOrder[]
+}
+
+// 商家（后台端）
+model Merchant {
+  id            Int              @id @default(autoincrement())
+  name          String           // 商家名称
+  contactName   String           // 联系人姓名
+  contactPhone  String           // 联系电话
+  address       String           // 地址
+  businessLicense String        // 营业执照号
+  passwordHash  String           // 密码哈希
+  deposit       Int       @default(0) // 保证金金额（分），500元 = 50000分
+  balancePoints Int       @default(0) // 可用积分余额（1分 = 1分钱）
+  status        MerchantStatus   @default(PENDING) // 状态
+  pointRule     Float      @default(1) // 积分比例：消费1元赠送多少积分，默认1元=1积分
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  applications  MerchantApplication[]
+  recharges     MerchantRecharge[]
+  pointRecords  PointRecord[]
+}
+
+// 平台管理员
+model Admin {
+  id          Int       @id @default(autoincrement())
+  username    String    @unique
+  passwordHash String
+  name        String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// 商家入驻申请
+model MerchantApplication {
+  id            Int            @id @default(autoincrement())
+  name          String         // 商家名称
+  contactName   String         // 联系人姓名
+  contactPhone  String         // 联系电话
+  email         String?        // 邮箱
+  provinceCode  String?        // 省份编码
+  cityCode      String?        // 城市编码
+  districtCode  String?        // 区县编码
+  provinceName  String?        // 省份名称
+  cityName      String?        // 城市名称
+  districtName  String?        // 区县名称
+  address       String         // 地址
+  traffic       String?        // 月均客流量
+  businessLicense String      // 营业执照号/图片
+  status        ApplicationStatus @default(PENDING)
+  remark        String?        // 备注
+  merchantId    Int?           // 关联商家（通过后创建）
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  merchant      Merchant?  @relation(fields: [merchantId], references: [id], onDelete: SetNull)
+}
+
+// 商家充值记录
+model MerchantRecharge {
+  id            Int        @id @default(autoincrement())
+  merchantId    Int
+  amount        Int        // 充值金额（分）
+  points        Int        // 充值获得积分数 = amount（因为1分=1分钱）
+  orderNo       String     @unique // 订单号
+  status        RechargeStatus @default(PENDING)
+  paidAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  merchant      Merchant  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+}
+
+// 用户积分账户
+model UserPoint {
+  id           Int        @id @default(autoincrement())
+  userId       Int        @unique
+  totalPoints  Int    @default(0)  // 累计获得积分
+  availablePoints Int @default(0)  // 可用积分
+  usedPoints   Int    @default(0)  // 已使用积分
+  expiredPoints Int  @default(0)  // 过期积分
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// 积分流水（给用户加积分/扣积分记录）
+model PointRecord {
+  id            Int             @id @default(autoincrement())
+  userId        Int
+  merchantId    Int
+  points        Int             // 积分变动数量（正数增加，负数减少）
+  type          PointRecordType
+  consumptionAmount Int?        // 消费金额（分），发积分时必填
+  orderNo       String?         // 消费订单号
+  expireAt      DateTime        // 积分过期时间
+  createdAt     DateTime  @default(now())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  merchant      Merchant   @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+}
+
+// 礼品商品（可兑换）
+model Product {
+  id          Int          @id @default(autoincrement())
+  name        String       // 礼品名称
+  description String?      // 描述
+  image       String?      // 图片
+  pricePoints Int          // 兑换所需积分
+  stock       Int          // 库存
+  status      ProductStatus @default(ACTIVE)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  exchangeOrders ExchangeOrder[]
+}
+
+// 兑换订单
+model ExchangeOrder {
+  id          Int              @id @default(autoincrement())
+  orderNo     String           @unique // 订单号
+  userId      Int
+  productId   Int
+  pointsCost  Int              // 消耗积分
+  address     String           // 收货地址
+  contactName String           // 收货人
+  contactPhone String          // 联系电话
+  status      ExchangeStatus   @default(PENDING)
+  remark      String?
+  shippedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+// 枚举定义
+enum MerchantStatus {
+  PENDING    // 待审核
+  APPROVED   // 已通过
+  REJECTED   // 已拒绝
+  DISABLED   // 已禁用
+}
+
+enum ApplicationStatus {
+  PENDING    // 待处理
+  APPROVED   // 已通过
+  REJECTED   // 已拒绝
+}
+
+enum RechargeStatus {
+  PENDING    // 待支付
+  PAID       // 已支付
+  FAILED     // 支付失败
+}
+
+enum PointRecordType {
+  EARN       // 获得积分（商家消费赠送）
+  EXCHANGE   // 兑换消耗
+  EXPIRE     // 过期清零
+  ADJUST     // 管理员调整
+}
+
+enum ProductStatus {
+  ACTIVE     // 上架
+  INACTIVE   // 下架
+}
+
+enum ExchangeStatus {
+  PENDING    // 待处理
+  SHIPPED    // 已发货
+  COMPLETED  // 已完成
+  CANCELLED  // 已取消
+}

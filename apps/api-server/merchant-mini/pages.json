@@ -1,0 +1,72 @@
+{
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "聚优惠商家",
+    "navigationBarBackgroundColor": "#fff",
+    "backgroundColor": "#f5f5f5"
+  },
+  "pages": [
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarTitleText": "商家登录"
+      }
+    },
+    {
+      "path": "pages/dashboard/dashboard",
+      "style": {
+        "navigationBarTitleText": "首页"
+      }
+    },
+    {
+      "path": "pages/stores/stores",
+      "style": {
+        "navigationBarTitleText": "门店管理"
+      }
+    },
+    {
+      "path": "pages/grant/grant",
+      "style": {
+        "navigationBarTitleText": "积分发放"
+      }
+    },
+    {
+      "path": "pages/recharge/recharge",
+      "style": {
+        "navigationBarTitleText": "充值订单"
+      }
+    }
+  ],
+  "tabBar": {
+    "color": "#666",
+    "selectedColor": "#667eea",
+    "backgroundColor": "#fff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/dashboard/dashboard",
+        "text": "首页",
+        "iconPath": "static/home.png",
+        "selectedIconPath": "static/home-active.png"
+      },
+      {
+        "pagePath": "pages/grant/grant",
+        "text": "发积分",
+        "iconPath": "static/grant.png",
+        "selectedIconPath": "static/grant-active.png"
+      },
+      {
+        "pagePath": "pages/recharge/recharge",
+        "text": "充值",
+        "iconPath": "static/recharge.png",
+        "selectedIconPath": "static/recharge-active.png"
+      },
+      {
+        "pagePath": "pages/stores/stores",
+        "text": "门店",
+        "iconPath": "static/store.png",
+        "selectedIconPath": "static/store-active.png"
+      }
+    ]
+  }
+}
